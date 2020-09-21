@@ -14,3 +14,9 @@ When assessing other view conuters, we found they were capped at a limited numbe
 
 ## Installing yourself
 Head over to the [releases](https://github.com/hi019/better-view-counter/releases) page to get an executable for your platofrm, then simply run it. By default the port is set to `3000`, you can change it by doing `better-view-counter --port 80`.
+
+## Building 
+To build,
+1. Clone project, cd into directory
+2. `go build *.go`
+3. Result will be `./main`

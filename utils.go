@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/tidwall/buntdb"
@@ -49,8 +48,6 @@ func generateBadge(title, value, color string) string {
 		valueTextLength = strconv.Itoa(len(value) * 70)
 	}
 
-	fmt.Println(valueTextLength)
-
 	return t.ExecuteString(map[string]interface{}{
 		"rectWidth":       rectWidth,
 		"title":           title,
@@ -67,7 +64,6 @@ func set(key string, value int) error {
 		return err
 	})
 	if err != nil {
-		fmt.Println("[DEBUG] " + err.Error())
 		return err
 	}
 
@@ -81,7 +77,6 @@ func get(key string) (counter int) {
 			return err
 		}
 		if counter, err = strconv.Atoi(val); err != nil {
-			fmt.Println("[DEBUG] " + err.Error())
 			counter = 0
 		}
 		return nil

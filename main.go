@@ -26,11 +26,29 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/badge/:user/:repo", func(c *fiber.Ctx) error {
-		key := c.Params("user") + c.Params("repo")
+		repoKey := c.Params("user") + "_" + c.Params("repo")
+		var updateCounter bool
 
-		counter := get(key)
-		counter++
-		set(key, counter)
+		counter := getCounter(repoKey)
+
+		// If we should display only unique views, then check if the IP has already visited the repo.
+		// If it hasn't, update the counter and add the user's IP to the DB
+		// If it has, dont update the counter
+		if c.Query("unique") != "" {
+			if getIP(c.IP()+repoKey) == "" {
+				updateCounter = true
+				setIP(c.IP() + repoKey)
+			} else {
+				updateCounter = false
+			}
+		} else {
+			updateCounter = true
+		}
+
+		if updateCounter {
+			counter++
+			setCounter(repoKey, counter)
+		}
 
 		badge := generateBadge("view count", strconv.Itoa(counter), "000000")
 

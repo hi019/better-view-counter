@@ -58,7 +58,7 @@ func generateBadge(title, value, color string) string {
 	})
 }
 
-func set(key string, value int) error {
+func setCounter(key string, value int) error {
 	err := db.Update(func(tx *buntdb.Tx) error {
 		_, _, err := tx.Set(key, strconv.Itoa(value), nil)
 		return err
@@ -70,7 +70,19 @@ func set(key string, value int) error {
 	return nil
 }
 
-func get(key string) (counter int) {
+func setIP(key string) error {
+	err := db.Update(func(tx *buntdb.Tx) error {
+		_, _, err := tx.Set(key, "1", nil)
+		return err
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func getCounter(key string) (counter int) {
 	_ = db.View(func(tx *buntdb.Tx) error {
 		val, err := tx.Get(key)
 		if err != nil {
@@ -83,4 +95,17 @@ func get(key string) (counter int) {
 	})
 
 	return counter
+}
+
+func getIP(key string) (ip string) {
+	_ = db.View(func(tx *buntdb.Tx) error {
+		val, err := tx.Get(key)
+		if err != nil {
+			return err
+		}
+		ip = val
+		return nil
+	})
+
+	return ip
 }

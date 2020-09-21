@@ -5,14 +5,60 @@ import (
 	"strconv"
 
 	"github.com/tidwall/buntdb"
+	"github.com/valyala/fasttemplate"
 )
 
-var badgeSVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"%s\" height=\"20\" role=\"img\" aria-label=\"%s: %s\"><title>%s: %s</title><linearGradient id=\"s\" x2=\"0\" y2=\"100%%\"><stop offset=\"0\" stop-color=\"#bbb\" stop-opacity=\".1\"/><stop offset=\"1\" stop-opacity=\".1\"/></linearGradient><clipPath id=\"r\"><rect width=\"%s\" height=\"20\" rx=\"3\" fill=\"#fff\"/></clipPath><g clip-path=\"url(#r)\"><rect width=\"65\" height=\"20\" fill=\"#555\"/><rect x=\"65\" width=\"93\" height=\"20\" fill=\"#%s\"/><rect width=\"%s\" height=\"20\" fill=\"url(#s)\"/></g><g fill=\"#fff\" text-anchor=\"middle\" font-family=\"Verdana,Geneva,DejaVu Sans,sans-serif\" text-rendering=\"geometricPrecision\" font-size=\"110\"><text aria-hidden=\"true\" x=\"335\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"550\">%s</text><text x=\"335\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"550\">%s</text><text aria-hidden=\"true\" x=\"1105\" y=\"150\" fill=\"#010101\" fill-opacity=\".3\" transform=\"scale(.1)\" textLength=\"830\">%s</text><text x=\"1105\" y=\"140\" transform=\"scale(.1)\" fill=\"#fff\" textLength=\"%s\">%s</text></g></svg>"
+const badgeSVG = `
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	xmlns:xlink="http://www.w3.org/1999/xlink" width="{{rectWidth}}" height="20" role="img" aria-label="{{title}}: {{value}}">
+	<title>{{title}}: {{value}}</title>
+	<linearGradient id="s" x2="0" y2="100%">
+		<stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+		<stop offset="1" stop-opacity=".1"/>
+	</linearGradient>
+	<clipPath id="r">
+		<rect width="100" height="20" rx="3" fill="#fff"/>
+	</clipPath>
+	<g clip-path="url(#r)">
+		<rect width="69" height="20" fill="#555"/>
+		<rect x="69" width="31" height="20" fill="#97ca00"/>
+		<rect width="{{rectWidth}}" height="20" fill="url(#s)"/>
+	</g>
+	<g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
+		<text aria-hidden="true" x="355" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{{titleTextLength}}">{{title}}</text>
+		<text x="355" y="140" transform="scale(.1)" fill="#fff" textLength="590">{{title}}</text>
+		<text aria-hidden="true" x="835" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{{valueTextLength}}">{{value}}</text>
+		<text x="835" y="140" transform="scale(.1)" fill="#fff" textLength="{{valueTextLength}}">{{value}}</text>
+	</g>
+</svg>
 
-func GenerateBadge(title, value, color string) string {
+`
+
+var t = fasttemplate.New(badgeSVG, "{{", "}}")
+
+func generateBadge(title, value, color string) string {
 	rectWidth := "100"
-	textLength := "200"
-	return fmt.Sprintf(badgeSVG, rectWidth, title, value, title, value, rectWidth, color, rectWidth, title, title, value, textLength, value)
+	titleTextLength := "590"
+
+	var valueTextLength string
+
+	if valueLen := len(value); valueLen <= 2 {
+		valueTextLength = "130"
+	} else {
+		valueTextLength = strconv.Itoa(len(value) * 70)
+	}
+
+	fmt.Println(valueTextLength)
+
+	return t.ExecuteString(map[string]interface{}{
+		"rectWidth":       rectWidth,
+		"title":           title,
+		"value":           value,
+		"color":           color,
+		"titleTextLength": titleTextLength,
+		"valueTextLength": valueTextLength,
+	})
 }
 
 func set(key string, value int) error {

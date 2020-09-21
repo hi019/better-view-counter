@@ -32,7 +32,7 @@ func main() {
 		counter++
 		set(key, counter)
 
-		badge := GenerateBadge("viewcount", strconv.Itoa(counter), "000000")
+		badge := generateBadge("view count", strconv.Itoa(counter), "000000")
 
 		c.Set(fiber.HeaderContentType, "image/svg+xml;charset=utf-8")
 		c.Set(fiber.HeaderCacheControl, "max-age=0, s-maxage=0, must-revalidate, no-cache, no-store")

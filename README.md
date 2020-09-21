@@ -1,4 +1,4 @@
-![](http://counter.gofiber.io/badge/YOUR_USERNAME/YOUR_REPO)
+![](http://counter.gofiber.io/badge/hi019/better-view-counter)
 
 # better-view-counter
 better-view-counter generates a view count badge for your repository's README. It supports a custom label and unique views only. To use it, first create a URL:

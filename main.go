@@ -58,7 +58,5 @@ func main() {
 		return c.SendString(badge)
 	})
 
-	// http://localhost:3000/badge/gofiber/fiber
-
 	log.Fatal(app.Listen(":3000"))
 }

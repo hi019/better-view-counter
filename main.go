@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	flag "github.com/spf13/pflag"
 	"github.com/tidwall/buntdb"
 )
 
@@ -20,6 +21,9 @@ func connect() *buntdb.DB {
 }
 
 func main() {
+	port := flag.Int("port", 3000, "Port to run webserver on")
+	flag.Parse()
+
 	db := connect()
 	defer db.Close()
 
@@ -58,5 +62,5 @@ func main() {
 		return c.SendString(badge)
 	})
 
-	log.Fatal(app.Listen(":3000"))
+	log.Fatal(app.Listen(":" + strconv.Itoa(*port)))
 }

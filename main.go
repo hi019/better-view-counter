@@ -1,66 +1,47 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"strconv"
+	"time"
+
+	"viewcounter/db"
+	"viewcounter/handlers"
 
 	"github.com/gofiber/fiber/v2"
-	flag "github.com/spf13/pflag"
-	"github.com/tidwall/buntdb"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 )
 
-var db *buntdb.DB
+// Default port is 3000
+var port = flag.Int("port", 3000, "Port to run webserver on")
 
-func connect() *buntdb.DB {
-	var err error
-	db, err = buntdb.Open("./data.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return db
+func init() {
+	// Parse flags
+	flag.Parse()
+
+	// Connect with database
+	db.Connect("./data.db")
 }
 
 func main() {
-	port := flag.Int("port", 3000, "Port to run webserver on")
-	flag.Parse()
-
-	db := connect()
+	// Close database on exit
 	defer db.Close()
 
-	app := fiber.New()
-
-	app.Get("/badge/:user/:repo", func(c *fiber.Ctx) error {
-		repoKey := c.Params("user") + "_" + c.Params("repo")
-		var updateCounter bool
-
-		counter := getCounter(repoKey)
-
-		// If we should display only unique views, then check if the IP has already visited the repo.
-		// If it hasn't, update the counter and add the user's IP to the DB
-		// If it has, dont update the counter
-		if c.Query("unique") != "" {
-			if getIP(c.IP()+repoKey) == "" {
-				updateCounter = true
-				setIP(c.IP() + repoKey)
-			} else {
-				updateCounter = false
-			}
-		} else {
-			updateCounter = true
-		}
-
-		if updateCounter {
-			counter++
-			setCounter(repoKey, counter)
-		}
-
-		badge := generateBadge("view count", strconv.Itoa(counter), "000000")
-
-		c.Set(fiber.HeaderContentType, "image/svg+xml;charset=utf-8")
-		c.Set(fiber.HeaderCacheControl, "max-age=0, s-maxage=0, must-revalidate, no-cache, no-store")
-
-		return c.SendString(badge)
+	// Create new fiber instance
+	app := fiber.New(fiber.Config{
+		GETOnly: true, // Only allow GET requests
 	})
 
+	// Limit requests 20 per minute with a minute cooldown
+	app.Use(limiter.New(limiter.Config{
+		Max:      20,
+		Duration: time.Minute,
+	}))
+
+	// Register handler
+	app.Get("/badge/:user/:repo", handlers.Badge())
+
+	// Listen for incoming connections
 	log.Fatal(app.Listen(":" + strconv.Itoa(*port)))
 }

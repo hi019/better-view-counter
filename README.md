@@ -20,3 +20,19 @@ To build,
 1. Clone project, cd into directory
 2. `go build`
 3. Result will be `./viewcounter`
+
+## Benchmarks
+On a 1 core VPS:
+
+```
+./bombardier -c 750 -n 1000000 http://127.0.0.1:3000/badge/demo/demo
+Statistics        Avg      Stdev        Max
+  Reqs/sec     38462.53    4243.36   47245.98
+  Latency       19.50ms   105.75ms      7.57s
+  HTTP codes:
+    1xx - 0, 2xx - 1000000, 3xx - 0, 4xx - 0, 5xx - 0
+    others - 0
+  Throughput:    52.80MB/s
+```
+
+Memory usage under 25mb.

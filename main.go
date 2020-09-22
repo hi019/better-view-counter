@@ -11,6 +11,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 )
 
 // Default port is 3000
@@ -32,6 +33,9 @@ func main() {
 	app := fiber.New(fiber.Config{
 		GETOnly: true, // Only allow GET requests
 	})
+
+	// Recover from panics
+	app.Use(recover.New())
 
 	// Limit requests 20 per minute with a minute cooldown
 	app.Use(limiter.New(limiter.Config{

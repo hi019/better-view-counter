@@ -33,9 +33,9 @@ func main() {
 		GETOnly: true, // Only allow GET requests
 	})
 
-	// Limit requests 20 per minute with a minute cooldown
+	// Limit requests 25 per minute with a minute cooldown
 	app.Use(limiter.New(limiter.Config{
-		Max:      20,
+		Max:      25,
 		Duration: time.Minute,
 	}))
 

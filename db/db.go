@@ -16,7 +16,7 @@ type database struct {
 	mux  sync.Mutex
 }
 
-// Create or connect with database
+// Connect creates or connects to the database
 func Connect(file string) {
 	conn, err := buntdb.Open(file)
 	if err != nil {
@@ -50,7 +50,7 @@ func Set(key, value string) error {
 	})
 }
 
-// Set will insert/update the key and int value
+// SetINT will insert/update the key and int value
 func SetINT(key string, value int) error {
 	return Set(key, strconv.Itoa(value))
 }

@@ -16,7 +16,7 @@ type database struct {
 	mux  sync.Mutex
 }
 
-// Create or connect with database
+// Connect creates or connects to the database
 func Connect(file string) {
 	conn, err := buntdb.Open(file)
 	if err != nil {

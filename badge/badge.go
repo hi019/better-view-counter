@@ -1,13 +1,16 @@
-package main
+package badge
 
 import (
+	"io"
+	"regexp"
 	"strconv"
+	"strings"
 
-	"github.com/tidwall/buntdb"
+	"github.com/valyala/bytebufferpool"
 	"github.com/valyala/fasttemplate"
 )
 
-const badgeSVG = `
+var badgeSVG = trim(`
 <svg
 	xmlns="http://www.w3.org/2000/svg"
 	xmlns:xlink="http://www.w3.org/1999/xlink" width="{{rectWidth}}" height="20" role="img" aria-label="{{title}}: {{value}}">
@@ -31,15 +34,20 @@ const badgeSVG = `
 		<text x="835" y="140" transform="scale(.1)" fill="#fff" textLength="{{valueTextLength}}">{{value}}</text>
 	</g>
 </svg>
+`)
 
-`
+const (
+	rectWidth       = "100"
+	titleTextLength = "590"
+)
 
-var t = fasttemplate.New(badgeSVG, "{{", "}}")
+var (
+	valueTextLength = "130"
+	tmpl            = fasttemplate.New(badgeSVG, "{{", "}}")
+)
 
-func generateBadge(title, value, color string) string {
-	rectWidth := "100"
-	titleTextLength := "590"
-
+// Generate will create a github badge with the provided metadata
+func Generate(title, value, color string) (badge []byte) {
 	var valueTextLength string
 
 	if valueLen := len(value); valueLen <= 2 {
@@ -47,65 +55,33 @@ func generateBadge(title, value, color string) string {
 	} else {
 		valueTextLength = strconv.Itoa(len(value) * 70)
 	}
-
-	return t.ExecuteString(map[string]interface{}{
-		"rectWidth":       rectWidth,
-		"title":           title,
-		"value":           value,
-		"color":           color,
-		"titleTextLength": titleTextLength,
-		"valueTextLength": valueTextLength,
-	})
-}
-
-func setCounter(key string, value int) error {
-	err := db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(key, strconv.Itoa(value), nil)
-		return err
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func setIP(key string) error {
-	err := db.Update(func(tx *buntdb.Tx) error {
-		_, _, err := tx.Set(key, "1", nil)
-		return err
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func getCounter(key string) (counter int) {
-	_ = db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get(key)
-		if err != nil {
-			return err
+	buf := bytebufferpool.Get()
+	_, _ = tmpl.ExecuteFunc(buf, func(w io.Writer, tag string) (int, error) {
+		switch tag {
+		case "rectWidth":
+			return buf.WriteString(rectWidth)
+		case "title":
+			return buf.WriteString(title)
+		case "value":
+			return buf.WriteString(value)
+		case "color":
+			return buf.WriteString(color)
+		case "titleTextLength":
+			return buf.WriteString(titleTextLength)
+		case "valueTextLength":
+			return buf.WriteString(valueTextLength)
 		}
-		if counter, err = strconv.Atoi(val); err != nil {
-			counter = 0
-		}
-		return nil
+		return 0, nil
 	})
-
-	return counter
+	badge = buf.Bytes()
+	bytebufferpool.Put(buf)
+	return
 }
 
-func getIP(key string) (ip string) {
-	_ = db.View(func(tx *buntdb.Tx) error {
-		val, err := tx.Get(key)
-		if err != nil {
-			return err
-		}
-		ip = val
-		return nil
-	})
-
-	return ip
+// Remove all tabs, spaces and new lines outside the tags
+func trim(str string) string {
+	trimmed := strings.TrimSpace(regexp.MustCompile(`\s+`).ReplaceAllString(str, " "))
+	trimmed = strings.Replace(trimmed, " <", "<", -1)
+	trimmed = strings.Replace(trimmed, "> ", ">", -1)
+	return trimmed
 }

@@ -50,7 +50,7 @@ func Set(key, value string) error {
 	})
 }
 
-// Set will insert/update the key and int value
+// SetINT will insert/update the key and int value
 func SetINT(key string, value int) error {
 	return Set(key, strconv.Itoa(value))
 }

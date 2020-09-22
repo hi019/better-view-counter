@@ -39,7 +39,7 @@ func main() {
 
 	// Limit requests 20 per minute with a minute cooldown
 	app.Use(limiter.New(limiter.Config{
-		Max:      20,
+		Max:      25,
 		Duration: time.Minute,
 	}))
 

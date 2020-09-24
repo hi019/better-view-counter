@@ -8,6 +8,8 @@ https://counter.gofiber.io/badge/YOUR_USERNAME/YOUR_REPO
 *Options*
 * Only count unique views (by IP): `{URL}?unique=true`
 
+Then in your README, embed it in an svg: `![](https://counter.gofiber.io/badge/YOUR_USERNAME/YOUR_REPO)`
+
 
 ## Why another view counter?
 When assessing other view conuters, we found they were capped at a limited number of requests per hour before the badge returned an error. This is not ideal for high-traffic repositories. Through [Fiber](https://gofiber.io), *better-view-counter* can handle about 30-40k requests per second with no cap on a 1 core vps (but please don't benchmark the main instance!). Memory usage is also great, staying under 25mb during heavy benchmarks.

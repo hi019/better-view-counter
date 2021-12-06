@@ -1,21 +1,11 @@
 ![](http://counter.gofiber.io/badge/hi019/better-view-counter)
 
 ## Usage
-better-view-counter generates a view count badge for your repository's README. It supports a custom label and unique views only. To use it, first create a URL:
-
-https://counter.gofiber.io/badge/YOUR_USERNAME/YOUR_REPO
-
-*Options*
-* Only count unique views (by IP): `{URL}?unique=true`
-
-Then in your README, embed it in an svg: `![](https://counter.gofiber.io/badge/YOUR_USERNAME/YOUR_REPO)`
+better-view-counter generates a view count badge for your repository's README. It supports a custom label and unique views only. To use it, first download the [latest release](https://github.com/hi019/better-view-counter/releases). And then embed the svg like this: `![](https://yourdomain.com/badge/YOUR_USERNAME/YOUR_REPO)`
 
 
 ## Why another view counter?
-When assessing other view conuters, we found they were capped at a limited number of requests per hour before the badge returned an error. This is not ideal for high-traffic repositories. Through [Fiber](https://gofiber.io), *better-view-counter* can handle about 30-40k requests per second with no cap on a 1 core vps (but please don't benchmark the main instance!). Memory usage is also great, staying under 25mb during heavy benchmarks.
-
-## Installing yourself
-Head over to the [releases](https://github.com/hi019/better-view-counter/releases) page to get an executable for your platofrm, then simply run it. By default the port is set to `3000`, you can change it by doing `./viewcounter -port 80`.
+When assessing other view conuters, we found they were capped at a limited number of requests per hour before the badge returned an error. This is not ideal for high-traffic repositories. Through [Fiber](https://gofiber.io), *better-view-counter* can handle about 30-40k requests per second with no cap on a 1 core vps. Memory usage also stays under 25mb during benchmarks.
 
 ## Building 
 To build,
